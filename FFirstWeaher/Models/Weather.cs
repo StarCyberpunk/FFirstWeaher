@@ -45,17 +45,7 @@ namespace FFirstWeaher.Models
             
         }
     }
-    public class Weathers{
-        
-        List<List<Weather>> weatherss = new List<List<Weather>>();
-       public List<Weather> weathers = new List<Weather>();
-        //Данные на следующие книги 
-       public int month { get; set; }
-       public int year { get; set; }
-        
-        
-        
-        }
+    
        
     }
 

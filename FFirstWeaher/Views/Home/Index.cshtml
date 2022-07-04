@@ -1,9 +1,12 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
 @{
     ViewData["Title"] = "Index";
+    Layout = "_LauoutS";
 }
 
-<h1>Погода в Москве</h1>
+
 <button><a asp-action="Add" asp-controller="AddEx" >Добавить</a></button>
-<button><a asp-action="Show" asp-controller="ShowEx"asp-route-year="2010" asp-route-month="1" >Показать</a></button>
+
+<button><a asp-action="ShowNew" asp-controller="ShowEx" asp-route-year="2010" asp-route-month="1">Показать</a></button>
 
