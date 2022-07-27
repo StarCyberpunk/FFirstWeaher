@@ -15,7 +15,8 @@ namespace FFirstWeaher.Models
     public class WeatherRepository
     {
         List<Weather> Weathers = new List<Weather>();
-        int[] years = new int[] { 2010, 2011, 2012, 2013 };
+        List<int> yearss = new List<int>();
+        
 
         public WeatherRepository(int year, int month)
         {
@@ -35,10 +36,10 @@ namespace FFirstWeaher.Models
                 else
                 {
 
-                    //TODO изменить года на поиске среди файлов 
-                    for (int i = 0; i < years.Length; i++)
+                  var names= Directory.GetFiles(@"DataWeather\");
+                    for (int i = 0; i < names.Length; i++)
                     {
-                       GetDataFromExcel(string.Format(@"DataWeather\moskva_{0}.xlsx", year), year);
+                        GetDataFromExcel(string.Format(names[i]));
                     }
                     Weathers = GetDataFromBD(year, month);
 
@@ -55,9 +56,11 @@ namespace FFirstWeaher.Models
            List<Weather> temp = new List<Weather>();
             using (ApplicationContext db = new ApplicationContext())
             {
-                IQueryable<Weather> weathers = db.Weathers.Include(p => p.Year);
-                weathers = weathers.Where(p => p.Year == year.ToString());
+                IQueryable<Weather> weathers = db.Weathers.Where(p => p.Year==year.ToString());
+                /*weathers = weathers.Where(p => p.Year == year.ToString());*/
                 weathers = weathers.Where(p => p.Month == month.ToString());
+                weathers = weathers.OrderBy(p => p.Date).ThenBy(p=>p.Time);
+                
                 temp = weathers.ToList();
                 return temp;
             }
@@ -65,7 +68,7 @@ namespace FFirstWeaher.Models
         
 
 
-        public void GetDataFromExcel(string filePath, int year)
+        public void GetDataFromExcel(string filePath)
         {
             
             IWorkbook Workbook;

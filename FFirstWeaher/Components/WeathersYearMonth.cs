@@ -11,7 +11,6 @@ namespace FFirstWeaher.Components
         
         public WeathersYearMonth()
         {
-            this.repository = new WeatherRepository(2010,1);
         }
         public IViewComponentResult Invoke(int year,int month)
         {
