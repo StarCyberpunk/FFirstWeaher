@@ -7,10 +7,11 @@ namespace FFirstWeaher.Components
 {
     public class WeathersYearMonth:ViewComponent
     {
-        private readonly WeatherRepository repository;
-         public WeathersYearMonth()
+        private  WeatherRepository repository;
+        
+        public WeathersYearMonth()
         {
-            this.repository =  new WeatherRepository(new int[] { 2010, 2011, 2012, 2013 });
+            this.repository = new WeatherRepository(2010,1);
         }
         public IViewComponentResult Invoke(int year,int month)
         {
@@ -26,24 +27,10 @@ namespace FFirstWeaher.Components
         }
         public List<Weather> GetMonthYearData(int year,int month)
         {
-            int countyears = repository.GetWeathers().Count;
-            foreach(WeathersForYear weathersss in repository.GetWeathers())
-            {
-                if (weathersss.year == year)
-                {
-                    for(int i = 0; i < weathersss.weathersForYear.Count; i++)
-                    {
-                        if (month == i + 1)
-                        {
-                           return weathersss.weathersForYear[i];
-                            break;
-                        }
-                    }
-                    break;
-                }
-                
-            }
-            return null;
+            
+            repository = new WeatherRepository(year,month);
+            return repository.GetWeathers();
+            
         }
     }
 }

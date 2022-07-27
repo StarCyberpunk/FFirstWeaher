@@ -7,103 +7,70 @@ using System.Data;
 using System.IO;
 using System;
 using FFirstWeaher.App_Data;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace FFirstWeaher.Models
 {
     public class WeatherRepository
     {
-         List<WeathersForYear> Weathers = new List<WeathersForYear>();
-        
-       
-        public WeatherRepository(int[] years)
+        List<Weather> Weathers = new List<Weather>();
+        int[] years = new int[] { 2010, 2011, 2012, 2013 };
+
+        public WeatherRepository(int year, int month)
         {
-            for(int i = 0; i < years.Length; i++)
-            {
-                Weathers.Add(GetDataFromExcel(string.Format(@"DataWeather\moskva_{0}.xlsx",years[i]),years[i]));
-            }
-            
+            GetData(year,month);
         }
-        public List<WeathersForYear> GetWeathers()
+
+        public void GetData(int year, int month)
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                if (db.Weathers.ToList().Count != 0)
+
+                {
+                    Weathers = GetDataFromBD(year, month);
+
+                }
+                else
+                {
+
+                    //TODO изменить года на поиске среди файлов 
+                    for (int i = 0; i < years.Length; i++)
+                    {
+                       GetDataFromExcel(string.Format(@"DataWeather\moskva_{0}.xlsx", year), year);
+                    }
+                    Weathers = GetDataFromBD(year, month);
+
+                }
+
+            }
+        }
+        public List<Weather> GetWeathers()
         {
             return Weathers;
         }
+            public List<Weather> GetDataFromBD(int year, int month)
+            {
+           List<Weather> temp = new List<Weather>();
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                IQueryable<Weather> weathers = db.Weathers.Include(p => p.Year);
+                weathers = weathers.Where(p => p.Year == year.ToString());
+                weathers = weathers.Where(p => p.Month == month.ToString());
+                temp = weathers.ToList();
+                return temp;
+            }
+            }
+        
 
-        /*public List<Weather> GetDataFromExcel(string filePath, int month, int year)
+
+        public void GetDataFromExcel(string filePath, int year)
         {
             
             IWorkbook Workbook;
             DataTable table = new DataTable();
-            try
-            {
-                using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-                {
-                    // XSSFWorkbook подходит для формата XLSX, HSSFWorkbook подходит для формата XLS
-                    string fileExt = Path.GetExtension(filePath).ToLower();
-                    if (fileExt == ".xls")
-                    {
-                        Workbook = new HSSFWorkbook(fileStream);
-                    }
-                    else if (fileExt == ".xlsx")
-                    {
-                        Workbook = new XSSFWorkbook(fileStream);
-                    }
-                    else
-                    {
-                        Workbook = null;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
-            // Находим на первом листе
-            ISheet sheet = Workbook.GetSheetAt(month - 1);
-            List<Weather> list = new List<Weather>();
-            // Первая строка - это строка заголовка
-
-            for (int i = 4; i <= sheet.LastRowNum; i++)
-            {
-
-                IRow headerRow = sheet.GetRow(i);
-                int cellCount = headerRow.LastCellNum;// Номер первой строки и столбца
-                                                      // Общее количество столбцов
-
-
-                IRow row = sheet.GetRow(i);
-                DataRow dataRow = table.NewRow();
-
-                List<string> vs = new List<string>();
-                if (list.Count == 63)
-                {
-                    Console.WriteLine();
-                }
-                if (row != null)
-                {
-
-                    for (int z = row.FirstCellNum; z < cellCount; z++)
-                    {
-                        if (row.GetCell(z) != null)
-                        {
-                            vs.Add(GetCellValue(row.GetCell(z)));
-                        }
-                    }
-                    if (vs.Count < 12) { vs.Add(""); }
-                }
-                Weather weather = new Weather(vs);
-
-                weathers.Add(weather);
-            }
-            return weathers;
-
-        }*/
-        public WeathersForYear GetDataFromExcel(string filePath,int year)
-        {
-            WeathersForYear weathersForYear = new WeathersForYear();
-            List<List<Weather>> weatherss = new List<List<Weather>>();
-            IWorkbook Workbook;
-            DataTable table = new DataTable();
+           
             try
             {
                 using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
@@ -131,55 +98,47 @@ namespace FFirstWeaher.Models
             using (ApplicationContext db = new ApplicationContext())
             {
                 for (int she = 0; she < Workbook.NumberOfSheets; she++)
-            {
-                // Находим на первом листе
-                ISheet sheet = Workbook.GetSheetAt(she);
-                List<Weather> list = new List<Weather>();
-                // Первая строка - это строка заголовка
-
-                for (int i = 4; i <= sheet.LastRowNum; i++)
                 {
+                    // Находим на первом листе
+                    ISheet sheet = Workbook.GetSheetAt(she);
 
-                    IRow headerRow = sheet.GetRow(i);
-                    int cellCount = headerRow.LastCellNum;// Номер первой строки и столбца
-                                                          // Общее количество столбцов
+                    // Первая строка - это строка заголовка
 
-
-                    IRow row = sheet.GetRow(i);
-                    DataRow dataRow = table.NewRow();
-
-                    List<string> vs = new List<string>();
-                    if (list.Count == 63)
-                    {
-                        Console.WriteLine();
-                    }
-                    if (row != null)
+                    for (int i = 4; i <= sheet.LastRowNum; i++)
                     {
 
-                        for (int z = row.FirstCellNum; z < cellCount; z++)
+                        IRow headerRow = sheet.GetRow(i);
+                        int cellCount = headerRow.LastCellNum;// Номер первой строки и столбца
+                                                              // Общее количество столбцов
+                        IRow row = sheet.GetRow(i);
+                        DataRow dataRow = table.NewRow();
+
+                        List<string> vs = new List<string>();
+                        
+                        if (row != null)
                         {
-                            if (row.GetCell(z) != null)
+
+                            for (int z = row.FirstCellNum; z < cellCount; z++)
                             {
-                                vs.Add(GetCellValue(row.GetCell(z)));
+                                if (row.GetCell(z) != null)
+                                {
+                                    vs.Add(GetCellValue(row.GetCell(z)));
+                                }
                             }
+                            if (vs.Count < 12) { vs.Add(""); }
                         }
-                        if (vs.Count < 12) { vs.Add(""); }
-                    }
-                    
+
                         Weather weather = new Weather(vs);
                         db.Weathers.Add(weather);
-                        list.Add(weather);
-                    
+                        
+                    }
                     
                 }
                 db.SaveChanges();
-                weatherss.Add(list);
+                
             }
-            }
-            weathersForYear.weathersForYear = weatherss;
-            weathersForYear.year = year;
-            return weathersForYear;
         }
+
         private static string GetCellValue(ICell cell)
         {
             if (cell == null)
@@ -215,6 +174,7 @@ namespace FFirstWeaher.Models
                     }
             }
         }
-        
+
     }
+
 }
