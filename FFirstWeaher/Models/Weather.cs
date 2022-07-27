@@ -10,8 +10,10 @@ namespace FFirstWeaher.Models
 {
     public class Weather
     {
-        
+        public int Id { get; set; }
         public string Date { get; set; }
+        public string Month { get; set; }
+        public string Year { get; set; }
         public string Time { get; set; }
         public string T { get; set; }
         public string Vlaga { get; set; }
@@ -31,7 +33,9 @@ namespace FFirstWeaher.Models
         {
             
                 Date = nn[0];
-                Time = nn[1];
+            Month = DateTime.Parse(nn[0]).Month.ToString();
+            Year = DateTime.Parse(nn[0]).Year.ToString();
+            Time = nn[1];
                 T = nn[2];
                 Vlaga = nn[3];
                 Td = nn[4];

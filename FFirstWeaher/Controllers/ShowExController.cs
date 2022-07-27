@@ -11,7 +11,13 @@ namespace FFirstWeaher.Controllers
            
             return View();
         }
-        public IActionResult ShowNew(int year,int month) { WeathersYearMonthViewModel W = new WeathersYearMonthViewModel(); W.month = month;W.year = year;   return View(W); }
+        public IActionResult ShowNew(int year,int month) 
+        {
+            WeathersYearMonthViewModel W = new WeathersYearMonthViewModel(); 
+            W.month = month;
+            W.year = year;  
+            return View(W); 
+        }
         
     }
 }

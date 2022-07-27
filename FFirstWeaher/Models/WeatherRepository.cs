@@ -6,6 +6,7 @@ using NPOI.XSSF.UserModel;
 using System.Data;
 using System.IO;
 using System;
+using FFirstWeaher.App_Data;
 
 namespace FFirstWeaher.Models
 {
@@ -18,7 +19,7 @@ namespace FFirstWeaher.Models
         {
             for(int i = 0; i < years.Length; i++)
             {
-                Weathers.Add(GetDataFromExcel(string.Format(@"C:\Users\notma\source\repos\FFirstWeaher\FFirstWeaher\DataWeather\moskva_{0}.xlsx",years[i]),years[i]));
+                Weathers.Add(GetDataFromExcel(string.Format(@"DataWeather\moskva_{0}.xlsx",years[i]),years[i]));
             }
             
         }
@@ -127,7 +128,9 @@ namespace FFirstWeaher.Models
             {
                 throw ex;
             }
-            for (int she = 0; she < Workbook.NumberOfSheets; she++)
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                for (int she = 0; she < Workbook.NumberOfSheets; she++)
             {
                 // Находим на первом листе
                 ISheet sheet = Workbook.GetSheetAt(she);
@@ -162,11 +165,16 @@ namespace FFirstWeaher.Models
                         }
                         if (vs.Count < 12) { vs.Add(""); }
                     }
-                    Weather weather = new Weather(vs);
-
-                    list.Add(weather);
+                    
+                        Weather weather = new Weather(vs);
+                        db.Weathers.Add(weather);
+                        list.Add(weather);
+                    
+                    
                 }
+                db.SaveChanges();
                 weatherss.Add(list);
+            }
             }
             weathersForYear.weathersForYear = weatherss;
             weathersForYear.year = year;
