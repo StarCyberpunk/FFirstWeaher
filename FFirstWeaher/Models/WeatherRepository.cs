@@ -22,6 +22,7 @@ namespace FFirstWeaher.Models
         {
             GetData(year,month);
         }
+        public WeatherRepository() { }
 
         public void GetData(int year, int month)
         {
@@ -141,7 +142,11 @@ namespace FFirstWeaher.Models
                 
             }
         }
-
+        public static void UpdateDataFromExcel(string filePath)
+        {
+            WeatherRepository w = new WeatherRepository();
+            w.GetDataFromExcel(filePath);
+        }
         private static string GetCellValue(ICell cell)
         {
             if (cell == null)

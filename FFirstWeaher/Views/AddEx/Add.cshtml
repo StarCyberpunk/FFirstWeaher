@@ -1,8 +1,14 @@
-﻿
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     ViewData["Title"] = "Add";
     Layout = "_LauoutS";
 }
 
-<h1>Add</h1>
+<h3>Выберите файл для загрузки</h3>
+<form asp-action="AddFile" asp-controller="AddEx" method="post" enctype="multipart/form-data">
+    <input type="file" name="uploadedFile" /><br>
+    <input type="submit" value="Загрузить" />
+</form>
+ 
+<h3>Все файлы</h3>
 

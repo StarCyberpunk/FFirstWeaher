@@ -1,12 +1,14 @@
 ﻿@using FFirstWeaher.Components;
 @using FFirstWeaher.Models;
+@using System.IO
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     ViewData["Title"] = "ShowNew";
 }
 <a asp-action="Index" asp-controller="Home">Back</a><p></p>
 @{
-    for(int z = 0; z < 4; z++)
+    var i= Directory.GetFiles(@"DataWeather\").Count();
+    for(int z = 0; z < i; z++)
     {
         <a asp-controller="ShowEx" asp-action="ShowNew" asp-route-year=201@(z) asp-route-month="1">201@(z)</a>
     }
